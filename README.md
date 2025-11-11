@@ -1,6 +1,8 @@
-# AyurSync – Ayurvedic Dietitian Platform 
+# AyurSync – Integrated Ayurvedic–Nutritional Diet Planning and Patient Management
 
-AyurSync is a single-file frontend with a minimal Node backend to manage Ayurvedic patient data and generate diet charts with modern nutritional analysis and Ayurvedic properties.
+This platform is a comprehensive digital ecosystem designed to empower Ayurvedic dietitians with an intelligent, data-driven interface that merges ancient Ayurvedic principles with modern nutritional science. It functions as a full-fledged clinical management and diet-generation tool that not only digitizes patient interactions but also augments them through algorithmic insights and real-time health analytics.
+
+The system is built around a multi-layered user flow encompassing patient management, diagnostic assessment, intelligent diet chart generation, and ongoing care optimization. At its core, it employs a dual-analysis engine capable of simultaneously computing modern nutritional breakdowns (macronutrients, micronutrients, caloric density) and Ayurvedic food energetics (Rasa, Virya, Vipaka, and Dosha impact) for every item or meal input.
 
 🌐 **Live Demo:** [Visit on Vercel]https://ayur-sync.vercel.app/
 
