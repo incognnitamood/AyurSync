@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AyurSync – Ayurvedic Dietitian Platform</title>
+    <style>
+      :root {
+        /* Professional palette based on provided scheme */
+        --brand-white: #FEFEFE;
+        --brand-sage: #677D5E;
+        --brand-deep: #61803F;
+        --brand-olive: #6D8F38;
+        --brand-leaf: #84A15D;
+        --brand-light: #D5D8AB;
+        --brand-yellow: #C9C24D;
+        --brand-orange: #CA912E;
+
+        /* Semantic tokens */
+        --bg: var(--brand-sage);
+        --panel: var(--brand-deep);
+        --accent: var(--brand-leaf);
+        --accent-2: var(--brand-olive);
+        --text: var(--brand-white);
+        --muted: var(--brand-light);
+        --danger: var(--brand-orange);
+        --warn: var(--brand-yellow);
+        --success: var(--brand-leaf);
+        --border: rgba(255,255,255,0.1);
+        --shadow: 0 10px 24px rgba(0,0,0,0.25);
+      }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        background: linear-gradient(180deg, var(--brand-deep), var(--brand-sage)); color: var(--text);
+      }
+      .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+      .card { background: var(--panel); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); transition: transform .22s ease, box-shadow .22s ease, background .22s ease; }
+      .card:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(0,0,0,0.35); }
+      h1, h2, h3 { margin: 0 0 12px; letter-spacing: .2px; position: relative; animation: titleIn .45s ease both; }
+      h1 { font-size: 28px; }
+      h2 { font-size: 22px; }
+      h1::after, h2::after, h3::after { content: ""; position: absolute; left: 0; bottom: -6px; width: 56px; height: 3px; border-radius: 2px; background: linear-gradient(90deg, var(--brand-yellow), var(--brand-orange)); opacity: .8; }
+      label { display: block; margin: 8px 0 6px; color: var(--muted); }
+      input, select, textarea { width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: #0d1124; color: var(--text); transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+      input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(132,161,93,0.25); transform: translateY(-1px); }
+      textarea { min-height: 100px; }
+      .row { display: grid; gap: 12px; }
+      .row.cols-2 { grid-template-columns: 1fr 1fr; }
+      .row.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+      .row.cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+      .btn {
+        display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); background: #111736; color: var(--text);
+        cursor: pointer; text-decoration: none; user-select: none; transition: transform .14s ease, box-shadow .14s ease, background .14s ease, filter .14s ease;
+        position: relative; overflow: hidden;
+      }
+      .btn.primary { background: var(--accent); color: #001119; border-color: var(--accent); }
+      .btn.success { background: var(--success); color: #001119; border-color: var(--success); }
+      .btn.warn { background: var(--warn); color: #231815; border-color: var(--warn); }
+      .btn.danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+      .btn.ghost { background: transparent; }
+      .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 16px rgba(0,0,0,0.25); filter: brightness(1.03); }
+      .btn:active { transform: translateY(0); box-shadow: none; }
+      .btn::after { content: ""; position: absolute; inset: 0; background: radial-gradient(120px 60px at 10% 10%, rgba(201,194,77,.18), transparent 70%); opacity: 0; transition: opacity .18s ease; }
+      .btn:hover::after { opacity: 1; }
+      .toolbar { display: flex; gap: 10px; flex-wrap: wrap; }
+      .nav { display: flex; gap: 8px; margin: 16px 0; flex-wrap: wrap; }
+      .nav .btn { background: var(--brand-olive); border-color: var(--brand-deep); }
+      .nav .btn.active { background: var(--brand-leaf); border-color: var(--brand-yellow); box-shadow: inset 0 0 0 1px rgba(201,194,77,0.45); color: #0f1a08; }
+      .grid { display: grid; gap: 12px; }
+      .grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+      .muted { color: var(--muted); }
+      .list { list-style: none; padding: 0; margin: 0; }
+      .list li { padding: 8px 0; border-bottom: 1px dashed #2b3351; display: flex; justify-content: space-between; align-items: center; transition: background .16s ease, transform .16s ease; }
+      .list li:hover { background: rgba(255,255,255,0.04); transform: translateX(2px); }
+      .pill { display: inline-block; border-radius: 999px; padding: 4px 10px; font-size: 12px; border: 1px solid var(--border); background: #0d1124; box-shadow: inset 0 0 0 1px rgba(201,194,77,0.18); }
+      .stat { background: #789945; border: 1px solid #61803F; border-radius: 10px; padding: 12px; position: relative; overflow: hidden; }
+      .stat::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, rgba(201,194,77,0.18), transparent 30%); pointer-events: none; }
+      .stat .value { font-size: 20px; font-weight: 700; }
+      .section { margin: 20px 0; }
+      .suggestions { position: absolute; background: #0d1124; border: 1px solid #2a314d; border-radius: 8px; width: 100%; z-index: 10; max-height: 200px; overflow: auto; }
+      .suggestions div { padding: 8px 10px; cursor: pointer; }
+      .suggestions div:hover { background: #11183a; }
+      .tag { display: inline-flex; align-items: center; gap: 6px; margin: 2px; padding: 4px 8px; border-radius: 999px; border: 1px solid #2a314d; background: #0d1124; font-size: 12px; }
+      .right { text-align: right; }
+      .hidden { display: none !important; }
+      .flex { display: flex; gap: 10px; }
+      .flex-wrap { flex-wrap: wrap; }
+      .justify-between { justify-content: space-between; }
+      .align-center { align-items: center; }
+      .table { width: 100%; border-collapse: collapse; }
+      .table th, .table td { padding: 8px; border-bottom: 1px dashed #2b3351; text-align: left; }
+      .notice { padding: 10px 12px; border-radius: 8px; background: #D5D8AB; color: #1f2a12; border: 1px solid #61803F; }
+      .week-grid { display: grid; grid-template-columns: 140px repeat(4, 1fr); gap: 8px; }
+      .week-grid .head { font-weight: 600; }
+      .week-day { background: var(--brand-leaf); border: 1px solid var(--brand-deep); border-radius: 10px; padding: 8px; color: #0f1a08; cursor: pointer; transition: transform .14s ease, box-shadow .14s ease, background .14s ease; }
+      .week-day:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(0,0,0,0.25); background: #7aa958; }
+      .chip { display:inline-block; padding:2px 8px; border-radius:999px; background: var(--brand-yellow); color:#1f2a12; font-size:11px; margin-right:6px; }
+      .fade-in { animation: fadeIn .22s ease-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes titleIn { from { opacity: 0; transform: translateY(4px); letter-spacing: -0.2px; } to { opacity: 1; transform: translateY(0); letter-spacing: .2px; } }
+      .section:not(.hidden) { animation: sectionIn .32s ease-out; }
+      @keyframes sectionIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+      /* Modal overlay and pop animations */
+      #recipeModal:not(.hidden), #plannerDetailModal:not(.hidden) { animation: overlayIn .22s ease-out; }
+      @keyframes overlayIn { from { opacity: 0; } to { opacity: 1; } }
+      #recipeModal .card, #plannerDetailModal .card { animation: modalPop .28s cubic-bezier(.2,.7,.2,1); }
+      @keyframes modalPop { 0% { opacity: 0; transform: translateY(10px) scale(.98); } 100% { opacity: 1; transform: translateY(0) scale(1); } }
+      @media print {
+        body { background: #fff; color: #000; }
+        .no-print { display: none !important; }
+        .card { box-shadow: none; border: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card" id="authCard">
+        <div class="flex justify-between align-center">
+          <h1>AyurSync</h1>
+          <div class="muted">Ayurvedic Dietitian Platform</div>
+        </div>
+        <div id="authView">
+          <div class="row cols-2">
+            <div>
+              <h2>Login</h2>
+              <label>Email</label>
+              <input id="loginEmail" placeholder="you@example.com" />
+              <label>Password</label>
+              <input id="loginPassword" type="password" placeholder="••••••••" />
+              <div class="toolbar" style="margin-top:10px">
+                <button class="btn primary" id="loginBtn">Login</button>
+                <button class="btn ghost" id="loginGuestBtn">Login as Guest</button>
+              </div>
+            </div>
+            <div>
+              <h2>Create Account</h2>
+              <label>Name</label>
+              <input id="signupName" placeholder="Full name" />
+              <label>Email</label>
+              <input id="signupEmail" placeholder="you@example.com" />
+              <label>Password</label>
+              <input id="signupPassword" type="password" placeholder="••••••••" />
+              <div class="toolbar" style="margin-top:10px">
+                <button class="btn success" id="signupBtn">Create Account</button>
+              </div>
+              <div class="muted" style="margin-top:8px">Local-only demo auth. Do not use real credentials.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card hidden" id="appCard">
+        <div class="flex justify-between align-center no-print">
+          <h1>AyurSync</h1>
+          <div class="toolbar">
+            <input id="foodsImport" type="file" accept="application/json" class="hidden" />
+            <button class="btn" id="importFoodsBtn">Import Foods JSON</button>
+            <button class="btn" id="logoutBtn">Logout</button>
+          </div>
+        </div>
+
+        <div class="nav no-print" id="navBar">
+          <button class="btn" data-view="dashboardView">Dashboard</button>
+          <button class="btn" data-view="patientsView">Patients</button>
+          <button class="btn" data-view="dietView">Diet Charts</button>
+          <button class="btn" data-view="recipesView">Recipes</button>
+          <button class="btn" data-view="plannerView">Planner</button>
+          <button class="btn" data-view="reportsView">Reports</button>
+          <button class="btn" data-view="progressView">Progress</button>
+        </div>
+
+        <div id="views">
+          <div id="dashboardView" class="section">
+            <div class="grid cols-3">
+              <div class="stat">
+                <div class="muted">Active Patients</div>
+                <div class="value" id="statActivePatients">0</div>
+              </div>
+              <div class="stat">
+                <div class="muted">New Patients (30d)</div>
+                <div class="value" id="statNewPatients">0</div>
+              </div>
+              <div class="stat">
+                <div class="muted">Upcoming Appts</div>
+                <div class="value" id="statUpcomingAppts">0</div>
+              </div>
+            </div>
+            <div class="section">
+              <div class="toolbar">
+                <button class="btn primary" id="createPatientBtn">New Patient</button>
+                <button class="btn" id="newAppointmentBtn">Schedule Appointment</button>
+              </div>
+            </div>
+            <div class="row cols-2">
+              <div>
+                <h3>Recent Patients</h3>
+                <ul class="list" id="recentPatientsList"></ul>
+              </div>
+              <div>
+                <h3>Upcoming Appointments</h3>
+                <ul class="list" id="upcomingApptsList"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div id="patientsView" class="section hidden">
+            <div class="row cols-2">
+              <div>
+                <h2>Create New Patient</h2>
+                <div class="row cols-2">
+                  <div>
+                    <label>First Name</label>
+                    <input id="pFirstName" />
+                  </div>
+                  <div>
+                    <label>Last Name</label>
+                    <input id="pLastName" />
+                  </div>
+                </div>
+                <div class="row cols-4">
+                  <div>
+                    <label>Age</label>
+                    <input id="pAge" type="number" />
+                  </div>
+                  <div>
+                    <label>Gender</label>
+                    <select id="pGender"><option>Female</option><option>Male</option><option>Other</option></select>
+                  </div>
+                  <div>
+                    <label>Height (cm)</label>
+                    <input id="pHeight" type="number" />
+                  </div>
+                  <div>
+                    <label>Weight (kg)</label>
+                    <input id="pWeight" type="number" />
+                  </div>
+                </div>
+                <label>Medical History</label>
+                <textarea id="pHistory"></textarea>
+                <label>Existing Conditions</label>
+                <textarea id="pConditions"></textarea>
+                <h3>Ayurvedic Assessment</h3>
+                <div class="row cols-3">
+                  <div>
+                    <label>Prakriti</label>
+                    <select id="pPrakriti"><option>Vata</option><option>Pitta</option><option>Kapha</option><option>Vata-Pitta</option><option>Pitta-Kapha</option><option>Vata-Kapha</option></select>
+                  </div>
+                  <div>
+                    <label>Vikriti</label>
+                    <select id="pVikriti"><option>Vata</option><option>Pitta</option><option>Kapha</option><option>Balanced</option></select>
+                  </div>
+                  <div>
+                    <label>Agni</label>
+                    <select id="pAgni"><option>Mandagni</option><option>Vishamagni</option><option>Tikshnagni</option><option>Samagni</option></select>
+                  </div>
+                </div>
+                <div class="row cols-3">
+                  <div>
+                    <label>Bowel Movements</label>
+                    <select id="pBowel"><option>Daily</option><option>Irregular</option><option>Constipation</option><option>Loose</option></select>
+                  </div>
+                  <div>
+                    <label>Sleep (hrs)</label>
+                    <input id="pSleep" type="number" />
+                  </div>
+                  <div>
+                    <label>Water Intake (L)</label>
+                    <input id="pWater" type="number" />
+                  </div>
+                </div>
+                <div>
+                  <label>Meal Frequency</label>
+                  <select id="pMeals"><option>2</option><option>3</option><option>4</option><option>5</option></select>
+                </div>
+                <div class="toolbar" style="margin-top:10px">
+                  <button class="btn success" id="savePatientBtn">Save Patient</button>
+                </div>
+              </div>
+              <div>
+                <h2>Find Existing Patient</h2>
+                <label>Search</label>
+                <input id="patientSearch" placeholder="Name or notes" />
+                <ul class="list" id="patientsList"></ul>
+              </div>
+            </div>
+          </div>
+
+          <div id="dietView" class="section hidden">
+            <h2>Create Diet Chart</h2>
+            <div class="row cols-3">
+              <div>
+                <label>Patient</label>
+                <select id="dietPatient"></select>
+              </div>
+              <div>
+                <label>Date</label>
+                <input id="dietDate" type="date" />
+              </div>
+              <div>
+                <label>Template</label>
+                <select id="dietTemplate"><option value="">None</option><option value="balanced-pitta">Balanced Pitta</option><option value="weight-loss">Weight Loss</option></select>
+              </div>
+            </div>
+            <div class="row cols-4 section">
+              <div>
+                <label>Meal</label>
+                <select id="dietMeal"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select>
+              </div>
+              <div style="position:relative">
+                <label>Add Food</label>
+                <input id="dietFoodInput" placeholder="Type food name" autocomplete="off" />
+                <div class="suggestions hidden" id="dietFoodSuggestions"></div>
+              </div>
+              <div>
+                <label>Quantity (g)</label>
+                <input id="dietQuantity" type="number" value="100" />
+              </div>
+              <div class="toolbar" style="align-items:flex-end">
+                <button class="btn primary" id="addFoodBtn">Add</button>
+                <button class="btn" id="addRecipeToMealBtn">Add Recipe</button>
+              </div>
+            </div>
+            <div class="row cols-2">
+              <div>
+                <h3>Meal Items</h3>
+                <table class="table" id="mealItemsTable">
+                  <thead>
+                    <tr><th>Item</th><th>Qty</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fats</th><th>Rasa</th><th>Virya</th><th>Vipaka</th><th>Doshas</th><th class="right">Actions</th></tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div>
+                <h3>Analysis</h3>
+                <div class="notice" id="dietAnalysisNotice">Add items to see analysis.</div>
+                <div class="section">
+                  <div class="grid cols-3">
+                    <div class="stat"><div class="muted">Calories</div><div class="value" id="aCalories">0</div></div>
+                    <div class="stat"><div class="muted">Protein (g)</div><div class="value" id="aProtein">0</div></div>
+                    <div class="stat"><div class="muted">Carbs (g)</div><div class="value" id="aCarbs">0</div></div>
+                  </div>
+                  <div class="grid cols-3" style="margin-top:8px">
+                    <div class="stat"><div class="muted">Fats (g)</div><div class="value" id="aFats">0</div></div>
+                    <div class="stat"><div class="muted">Pitta</div><div class="value" id="aPitta">0</div></div>
+                    <div class="stat"><div class="muted">Vata</div><div class="value" id="aVata">0</div></div>
+                  </div>
+                  <div class="grid cols-3" style="margin-top:8px">
+                    <div class="stat"><div class="muted">Kapha</div><div class="value" id="aKapha">0</div></div>
+                    <div class="stat"><div class="muted">Vitamin Score</div><div class="value" id="aVitamins">0</div></div>
+                    <div class="stat"><div class="muted">Mineral Score</div><div class="value" id="aMinerals">0</div></div>
+                  </div>
+                </div>
+                <div id="dietFeedback" class="notice"></div>
+                <div class="toolbar" style="margin-top:10px">
+                  <button class="btn success" id="saveMealBtn">Save Meal to Chart</button>
+                </div>
+              </div>
+            </div>
+            <div class="section">
+              <h3>Day Plan</h3>
+              <ul class="list" id="dayPlanList"></ul>
+              <label>Notes</label>
+              <textarea id="dietNotes"></textarea>
+              <div class="toolbar" style="margin-top:10px">
+                <button class="btn success" id="saveDayPlanBtn">Finalize Day Plan</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="recipesView" class="section hidden">
+            <div class="row cols-2">
+              <div>
+                <h2>Create Recipe</h2>
+                <label>Recipe Name</label>
+                <input id="recipeName" />
+                <div class="row cols-3">
+                  <div style="position:relative">
+                    <label>Add Ingredient</label>
+                    <input id="recipeFoodInput" placeholder="Type food name" autocomplete="off" />
+                    <div class="suggestions hidden" id="recipeFoodSuggestions"></div>
+                  </div>
+                  <div>
+                    <label>Quantity (g)</label>
+                    <input id="recipeQuantity" type="number" value="100" />
+                  </div>
+                  <div class="toolbar" style="align-items:flex-end">
+                    <button class="btn primary" id="addIngredientBtn">Add Ingredient</button>
+                  </div>
+                </div>
+                <table class="table" id="recipeItemsTable">
+                  <thead><tr><th>Ingredient</th><th>Qty</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fats</th><th class="right">Actions</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+                <div class="toolbar" style="margin-top:10px">
+                  <button class="btn success" id="saveRecipeBtn">Save Recipe</button>
+                  <input id="recipesImport" type="file" accept="application/json" class="hidden" />
+                  <button class="btn" id="importRecipesBtn">Import Recipes JSON</button>
+                </div>
+              </div>
+              <div>
+                <h2>Recipes</h2>
+                <ul class="list" id="recipesList"></ul>
+                <div id="recipeModal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center;">
+                  <div class="card" style="max-width:700px; width:90%; background:var(--panel); color:var(--text);">
+                    <div class="flex justify-between align-center">
+                      <h3 id="recipeModalTitle">Recipe</h3>
+                      <button class="btn" id="recipeModalClose">Close</button>
+                    </div>
+                    <div class="row cols-2">
+                      <div>
+                        <label>Time of day</label>
+                        <select id="recipeModalTime"><option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option></select>
+                      </div>
+                      <div>
+                        <label>Patient (optional)</label>
+                        <select id="recipeModalPatient"></select>
+                      </div>
+                    </div>
+                    <div id="recipeModalBody" style="margin-top:8px"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="plannerView" class="section hidden">
+            <h2>Weekly Planner</h2>
+            <div class="row cols-3">
+              <div>
+                <label>Patient</label>
+                <select id="plannerPatient"></select>
+              </div>
+              <div>
+                <label>Start Date</label>
+                <input id="plannerStartDate" type="date" />
+              </div>
+              <div class="toolbar" style="align-items:flex-end">
+                <button class="btn primary" id="generateWeekBtn">Generate Weekly Plan</button>
+                <button class="btn success" id="saveWeekBtn">Save Weekly Plan</button>
+              </div>
+            </div>
+            <div class="notice">Generation adapts meals to the patient's Vikriti and Agni, balancing macronutrients and dosha impact.</div>
+            <div id="weekGrid" class="section"></div>
+            <div id="plannerDetailModal" class="hidden" style="position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center;">
+              <div class="card" style="max-width:700px; width:90%; background:var(--panel); color:var(--text);">
+                <div class="flex justify-between align-center">
+                  <h3 id="plannerDetailTitle">Meal Details</h3>
+                  <button class="btn" id="plannerDetailClose">Close</button>
+                </div>
+                <div id="plannerDetailBody" style="margin-top:8px"></div>
+              </div>
+            </div>
+          </div>
+
+          <div id="reportsView" class="section hidden">
+            <h2>Reports</h2>
+            <div class="row cols-3">
+              <div>
+                <label>Patient</label>
+                <select id="reportPatient"></select>
+              </div>
+              <div>
+                <label>Date</label>
+                <input id="reportDate" type="date" />
+              </div>
+              <div class="toolbar" style="align-items:flex-end">
+                <button class="btn" id="loadReportBtn">Load</button>
+                <button class="btn primary" id="printReportBtn">Print / PDF</button>
+              </div>
+            </div>
+            <div id="reportContent" class="card" style="margin-top:12px"></div>
+          </div>
+
+          <div id="progressView" class="section hidden">
+            <h2>Progress Tracking</h2>
+            <div class="row cols-3">
+              <div>
+                <label>Patient</label>
+                <select id="progressPatient"></select>
+              </div>
+              <div>
+                <label>Date</label>
+                <input id="progressDate" type="date" />
+              </div>
+              <div>
+                <label>Weight (kg)</label>
+                <input id="progressWeight" type="number" />
+              </div>
+            </div>
+            <div class="row cols-2">
+              <div>
+                <label>Well-being Notes</label>
+                <textarea id="progressNotes"></textarea>
+                <div class="toolbar" style="margin-top:10px">
+                  <button class="btn success" id="saveProgressBtn">Save Progress</button>
+                </div>
+              </div>
+              <div>
+                <h3>History</h3>
+                <ul class="list" id="progressList"></ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const S = {
+        usersKey: 'ayursync_users',
+        sessionKey: 'ayursync_session',
+        patientsKey: 'ayursync_patients',
+        apptsKey: 'ayursync_appointments',
+        chartsKey: 'ayursync_dietCharts',
+        recipesKey: 'ayursync_recipes',
+        foodsKey: 'ayursync_foods'
+      };
+      function getStore(k) { try { return JSON.parse(localStorage.getItem(k) || '[]'); } catch(e) { return []; } }
+      function setStore(k, v) { localStorage.setItem(k, JSON.stringify(v)); }
+      function uid(prefix='id') { return prefix + '_' + Math.random().toString(36).slice(2,9); }
+
+      const DEFAULT_FOODS = [
+        { name:'Brown Rice', calories:111, protein:2.6, carbs:23, fats:0.9, vitamins:20, minerals:25, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.1,pitta:-0.1,kapha:+0.1} },
+        { name:'Quinoa', calories:120, protein:4.4, carbs:21.3, fats:1.9, vitamins:30, minerals:35, rasa:'Madhura', virya:'Ushna', vipaka:'Madhura', dosha:{vata:-0.1,pitta:+0.1,kapha:0} },
+        { name:'Moong Dal', calories:105, protein:7.0, carbs:19.0, fats:0.6, vitamins:28, minerals:32, rasa:'Kashaya', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.2,pitta:-0.1,kapha:-0.1} },
+        { name:'Ghee', calories:900, protein:0, carbs:0, fats:100, vitamins:10, minerals:5, rasa:'Madhura', virya:'Ushna', vipaka:'Madhura', dosha:{vata:-0.3,pitta:+0.2,kapha:+0.3} },
+        { name:'Almonds', calories:575, protein:21, carbs:22, fats:49, vitamins:35, minerals:40, rasa:'Kashaya', virya:'Ushna', vipaka:'Madhura', dosha:{vata:-0.2,pitta:+0.1,kapha:+0.2} },
+        { name:'Apple', calories:52, protein:0.3, carbs:14, fats:0.2, vitamins:22, minerals:18, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:0,pitta:-0.1,kapha:+0.1} },
+        { name:'Banana', calories:89, protein:1.1, carbs:23, fats:0.3, vitamins:20, minerals:20, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.1,pitta:-0.1,kapha:+0.2} },
+        { name:'Spinach', calories:23, protein:2.9, carbs:3.6, fats:0.4, vitamins:50, minerals:45, rasa:'Tikta', virya:'Sheeta', vipaka:'Katu', dosha:{vata:+0.1,pitta:-0.2,kapha:-0.2} },
+        { name:'Carrot', calories:41, protein:0.9, carbs:10, fats:0.2, vitamins:40, minerals:25, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.1,pitta:-0.1,kapha:+0.1} },
+        { name:'Chicken Breast', calories:165, protein:31, carbs:0, fats:3.6, vitamins:25, minerals:30, rasa:'Madhura', virya:'Ushna', vipaka:'Madhura', dosha:{vata:-0.1,pitta:+0.2,kapha:+0.1} },
+        { name:'Paneer', calories:265, protein:18, carbs:1.2, fats:20.8, vitamins:20, minerals:30, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.2,pitta:-0.1,kapha:+0.3} },
+        { name:'Yogurt', calories:59, protein:10, carbs:3.6, fats:0.4, vitamins:30, minerals:35, rasa:'Amla', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.2,pitta:-0.2,kapha:+0.2} },
+        { name:'Turmeric', calories:354, protein:7.8, carbs:65, fats:9.9, vitamins:30, minerals:35, rasa:'Tikta', virya:'Ushna', vipaka:'Katu', dosha:{vata:-0.1,pitta:-0.2,kapha:-0.2} },
+        { name:'Ginger', calories:80, protein:1.8, carbs:17.8, fats:0.8, vitamins:20, minerals:25, rasa:'Katu', virya:'Ushna', vipaka:'Madhura', dosha:{vata:-0.2,pitta:+0.2,kapha:-0.3} },
+        { name:'Cumin', calories:375, protein:18, carbs:44, fats:22, vitamins:25, minerals:45, rasa:'Katu', virya:'Ushna', vipaka:'Katu', dosha:{vata:-0.2,pitta:+0.2,kapha:-0.2} },
+        { name:'Coriander', calories:23, protein:2.1, carbs:3.7, fats:0.5, vitamins:30, minerals:30, rasa:'Kashaya', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.1,pitta:-0.2,kapha:-0.2} },
+        { name:'Lentils', calories:116, protein:9, carbs:20, fats:0.4, vitamins:28, minerals:35, rasa:'Kashaya', virya:'Ushna', vipaka:'Madhura', dosha:{vata:+0.1,pitta:-0.1,kapha:-0.2} },
+        { name:'Pear', calories:57, protein:0.4, carbs:15, fats:0.1, vitamins:20, minerals:20, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:0,pitta:-0.1,kapha:+0.1} },
+        { name:'Oats', calories:389, protein:17, carbs:66, fats:7, vitamins:25, minerals:35, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.1,pitta:-0.1,kapha:+0.1} },
+        { name:'Honey', calories:304, protein:0.3, carbs:82, fats:0, vitamins:10, minerals:15, rasa:'Madhura', virya:'Ushna', vipaka:'Madhura', dosha:{vata:-0.1,pitta:+0.2,kapha:+0.3} },
+        { name:'Coconut Oil', calories:862, protein:0, carbs:0, fats:100, vitamins:5, minerals:5, rasa:'Madhura', virya:'Ushna', vipaka:'Madhura', dosha:{vata:-0.2,pitta:+0.3,kapha:+0.4} },
+        { name:'Tofu', calories:76, protein:8, carbs:1.9, fats:4.8, vitamins:20, minerals:30, rasa:'Kashaya', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.1,pitta:-0.1,kapha:+0.1} },
+        { name:'Sweet Potato', calories:86, protein:1.6, carbs:20, fats:0.1, vitamins:40, minerals:35, rasa:'Madhura', virya:'Ushna', vipaka:'Madhura', dosha:{vata:-0.2,pitta:+0.1,kapha:+0.2} },
+        { name:'Raita', calories:120, protein:5, carbs:8, fats:7, vitamins:25, minerals:30, rasa:'Amla', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.2,pitta:-0.2,kapha:+0.1} },
+        { name:'Dal Khichdi', calories:140, protein:6, carbs:25, fats:2, vitamins:28, minerals:32, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.2,pitta:-0.2,kapha:+0.1} },
+        { name:'Pumpkin', calories:26, protein:1, carbs:6.5, fats:0.1, vitamins:40, minerals:30, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.2,pitta:-0.2,kapha:+0.1} },
+        { name:'Black Pepper', calories:251, protein:10, carbs:64, fats:3.3, vitamins:20, minerals:40, rasa:'Katu', virya:'Ushna', vipaka:'Katu', dosha:{vata:-0.2,pitta:+0.3,kapha:-0.3} },
+        { name:'Cucumber', calories:16, protein:0.7, carbs:3.6, fats:0.1, vitamins:20, minerals:18, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:0,pitta:-0.2,kapha:+0.1} },
+        { name:'Basmati Rice', calories:130, protein:2.7, carbs:28, fats:0.3, vitamins:15, minerals:20, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.1,pitta:-0.1,kapha:+0.2} },
+        { name:'Chapati', calories:120, protein:3.5, carbs:20, fats:3.0, vitamins:15, minerals:20, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.1,pitta:-0.1,kapha:+0.1} },
+        { name:'Green Tea', calories:0, protein:0, carbs:0, fats:0, vitamins:10, minerals:10, rasa:'Kashaya', virya:'Sheeta', vipaka:'Katu', dosha:{vata:+0.1,pitta:-0.2,kapha:-0.2} },
+        { name:'Milk', calories:42, protein:3.4, carbs:5, fats:1, vitamins:20, minerals:25, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.2,pitta:-0.2,kapha:+0.3} },
+        { name:'Dates', calories:277, protein:1.8, carbs:75, fats:0.2, vitamins:25, minerals:30, rasa:'Madhura', virya:'Ushna', vipaka:'Madhura', dosha:{vata:-0.2,pitta:+0.1,kapha:+0.3} },
+        { name:'Papaya', calories:43, protein:0.5, carbs:11, fats:0.3, vitamins:35, minerals:30, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:0,pitta:-0.2,kapha:+0.1} },
+        { name:'Mung Sprouts', calories:30, protein:3, carbs:6, fats:0.2, vitamins:35, minerals:35, rasa:'Kashaya', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:+0.1,pitta:-0.2,kapha:-0.2} },
+        { name:'Fish (Salmon)', calories:208, protein:20, carbs:0, fats:13, vitamins:30, minerals:35, rasa:'Madhura', virya:'Ushna', vipaka:'Madhura', dosha:{vata:-0.1,pitta:+0.2,kapha:+0.2} },
+        { name:'Lassi', calories:120, protein:5, carbs:18, fats:2, vitamins:20, minerals:25, rasa:'Amla', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.2,pitta:-0.2,kapha:+0.2} },
+        { name:'Besan Chilla', calories:180, protein:9, carbs:20, fats:6, vitamins:20, minerals:25, rasa:'Kashaya', virya:'Ushna', vipaka:'Madhura', dosha:{vata:+0.1,pitta:-0.1,kapha:-0.1} },
+        { name:'Porridge', calories:120, protein:4, carbs:22, fats:3, vitamins:20, minerals:25, rasa:'Madhura', virya:'Sheeta', vipaka:'Madhura', dosha:{vata:-0.1,pitta:-0.1,kapha:+0.1} },
+        { name:'Masala Tea', calories:90, protein:0, carbs:15, fats:2, vitamins:10, minerals:12, rasa:'Katu', virya:'Ushna', vipaka:'Katu', dosha:{vata:-0.1,pitta:+0.2,kapha:-0.2} }
+      ];
+
+      function ensureFoodsLoaded() {
+        const existing = JSON.parse(localStorage.getItem(S.foodsKey) || 'null');
+        if (!existing || !Array.isArray(existing) || existing.length === 0) {
+          localStorage.setItem(S.foodsKey, JSON.stringify(DEFAULT_FOODS));
+        }
+      }
+      ensureFoodsLoaded();
+
+      const authCard = document.getElementById('authCard');
+      const appCard = document.getElementById('appCard');
+      const navBar = document.getElementById('navBar');
+      const views = ['dashboardView','patientsView','dietView','recipesView','reportsView','progressView'];
+      function showApp() { authCard.classList.add('hidden'); appCard.classList.remove('hidden'); refreshAll(); }
+      function showAuth() { appCard.classList.add('hidden'); authCard.classList.remove('hidden'); }
+      function setSession(user) { localStorage.setItem(S.sessionKey, JSON.stringify(user)); }
+      function getSession() { try { return JSON.parse(localStorage.getItem(S.sessionKey) || 'null'); } catch(e) { return null; } }
+      function logout() { localStorage.removeItem(S.sessionKey); showAuth(); }
+
+      document.getElementById('logoutBtn').onclick = logout;
+      document.getElementById('loginBtn').onclick = () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const pw = document.getElementById('loginPassword').value;
+        const users = getStore(S.usersKey);
+        const user = users.find(u => u.email === email && u.password === pw);
+        if (user) { setSession(user); showApp(); } else { alert('Invalid credentials'); }
+      };
+      document.getElementById('loginGuestBtn').onclick = () => { setSession({ id: uid('user'), name:'Guest', email:'guest@demo' }); showApp(); };
+      document.getElementById('signupBtn').onclick = () => {
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const pw = document.getElementById('signupPassword').value;
+        if (!name || !email || !pw) { alert('Fill all fields'); return; }
+        const users = getStore(S.usersKey);
+        if (users.find(u => u.email === email)) { alert('Email already exists'); return; }
+        const user = { id: uid('user'), name, email, password: pw, createdAt: Date.now() };
+        users.push(user); setStore(S.usersKey, users); setSession(user); showApp();
+      };
+
+      Array.from(navBar.querySelectorAll('button')).forEach(b => {
+        b.onclick = () => {
+          views.forEach(v => document.getElementById(v).classList.add('hidden'));
+          document.getElementById(b.dataset.view).classList.remove('hidden');
+          Array.from(navBar.querySelectorAll('button')).forEach(x=>x.classList.remove('active'));
+          b.classList.add('active');
+          if (b.dataset.view === 'dashboardView') refreshDashboard();
+          if (b.dataset.view === 'patientsView') refreshPatients();
+          if (b.dataset.view === 'dietView') refreshDietView();
+          if (b.dataset.view === 'recipesView') refreshRecipes();
+          if (b.dataset.view === 'plannerView') refreshPlanner();
+          if (b.dataset.view === 'reportsView') refreshReports();
+          if (b.dataset.view === 'progressView') refreshProgress();
+        };
+      });
+
+      function refreshAll() { refreshDashboard(); refreshPatients(); refreshDietView(); refreshRecipes(); refreshReports(); refreshProgress(); }
+
+      function refreshDashboard() {
+        const patients = getStore(S.patientsKey);
+        const appts = getStore(S.apptsKey);
+        document.getElementById('statActivePatients').textContent = patients.length;
+        const thirtyDaysAgo = Date.now() - 30*86400000;
+        document.getElementById('statNewPatients').textContent = patients.filter(p => p.createdAt && p.createdAt > thirtyDaysAgo).length;
+        const upcoming = appts.filter(a => new Date(a.date).getTime() >= Date.now()).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,5);
+        document.getElementById('statUpcomingAppts').textContent = upcoming.length;
+        const recent = patients.sort((a,b)=> (b.lastViewed||0)-(a.lastViewed||0)).slice(0,5);
+        const recentList = document.getElementById('recentPatientsList'); recentList.innerHTML = '';
+        recent.forEach(p => { const li = document.createElement('li'); li.innerHTML = `<div>${p.firstName} ${p.lastName}</div><div class="pill">${p.prakriti||''}</div>`; recentList.appendChild(li); });
+        const apptsList = document.getElementById('upcomingApptsList'); apptsList.innerHTML = '';
+        upcoming.forEach(a => { const li = document.createElement('li'); li.innerHTML = `<div>${a.patientName}</div><div>${a.date} ${a.time||''}</div>`; apptsList.appendChild(li); });
+      }
+      document.getElementById('createPatientBtn').onclick = () => { views.forEach(v => document.getElementById(v).classList.add('hidden')); document.getElementById('patientsView').classList.remove('hidden'); };
+      document.getElementById('newAppointmentBtn').onclick = () => {
+        const patients = getStore(S.patientsKey);
+        if (patients.length === 0) { alert('Add a patient first'); return; }
+        const p = patients[0];
+        const appts = getStore(S.apptsKey);
+        appts.push({ id: uid('appt'), patientId: p.id, patientName: p.firstName+' '+p.lastName, date: new Date(Date.now()+2*86400000).toISOString().slice(0,10), time:'10:00' });
+        setStore(S.apptsKey, appts); refreshDashboard(); alert('Sample appointment added for first patient');
+      };
+
+      function savePatient() {
+        const p = {
+          id: uid('pat'), firstName: document.getElementById('pFirstName').value.trim(), lastName: document.getElementById('pLastName').value.trim(),
+          age: Number(document.getElementById('pAge').value||0), gender: document.getElementById('pGender').value,
+          height: Number(document.getElementById('pHeight').value||0), weight: Number(document.getElementById('pWeight').value||0),
+          history: document.getElementById('pHistory').value, conditions: document.getElementById('pConditions').value,
+          prakriti: document.getElementById('pPrakriti').value, vikriti: document.getElementById('pVikriti').value,
+          agni: document.getElementById('pAgni').value, bowel: document.getElementById('pBowel').value,
+          sleep: Number(document.getElementById('pSleep').value||0), water: Number(document.getElementById('pWater').value||0), meals: Number(document.getElementById('pMeals').value||0),
+          createdAt: Date.now(), lastViewed: Date.now()
+        };
+        if (!p.firstName || !p.lastName) { alert('Enter name'); return; }
+        const patients = getStore(S.patientsKey); patients.push(p); setStore(S.patientsKey, patients);
+        refreshPatients();
+        resetPatientForm();
+        document.getElementById('pFirstName').focus();
+        alert('Patient saved. You can add another now.');
+      }
+      document.getElementById('savePatientBtn').onclick = savePatient;
+      document.getElementById('patientSearch').oninput = () => refreshPatients();
+      function refreshPatients() {
+        cleanInvalidPatients();
+        const patients = getStore(S.patientsKey);
+        const q = document.getElementById('patientSearch').value.toLowerCase();
+        const list = document.getElementById('patientsList'); list.innerHTML = '';
+        patients.filter(p => (p.firstName+' '+p.lastName).toLowerCase().includes(q) || (p.history||'').toLowerCase().includes(q)).forEach(p => {
+          const li = document.createElement('li');
+          const meta = `${p.age||''} • ${p.gender||''} • ${p.prakriti||''}`;
+          li.innerHTML = `<div><strong>${p.firstName} ${p.lastName}</strong><div class="muted">${meta}</div></div><div class="toolbar"><button class="btn" data-id="${p.id}">Open</button><button class="btn danger" data-del="${p.id}">Delete</button></div>`;
+          li.querySelector('button[data-id]').onclick = () => { openPatient(p.id); };
+          li.querySelector('button[data-del]').onclick = () => { deletePatient(p.id); };
+          list.appendChild(li);
+        });
+        refreshDietPatientSelect(); refreshReportPatientSelect(); refreshProgressPatientSelect();
+      }
+      function resetPatientForm() {
+        const ids = ['pFirstName','pLastName','pAge','pHeight','pWeight','pHistory','pConditions','pSleep','pWater'];
+        ids.forEach(id => { const el = document.getElementById(id); if (!el) return; el.value = ''; });
+        ['pGender','pPrakriti','pVikriti','pAgni','pBowel','pMeals'].forEach(id => { const el = document.getElementById(id); if (!el) return; el.selectedIndex = 0; });
+      }
+      function deletePatient(id) {
+        const patients = getStore(S.patientsKey);
+        const p = patients.find(x=>x.id===id);
+        if (!p) return;
+        const go = confirm(`Delete patient ${p.firstName} ${p.lastName}? This cannot be undone.`);
+        if (!go) return;
+        const filtered = patients.filter(x=>x.id!==id);
+        setStore(S.patientsKey, filtered);
+        // Optional cleanup: remove related appointments and charts
+        setStore(S.apptsKey, getStore(S.apptsKey).filter(a=>a.patientId!==id));
+        setStore(S.chartsKey, getStore(S.chartsKey).filter(c=>c.patientId!==id));
+        refreshAll();
+        alert('Patient deleted');
+      }
+      function isValidPatient(p) {
+        if (!p) return false;
+        const fn = (p.firstName||'').toString().trim();
+        const ln = (p.lastName||'').toString().trim();
+        if (!fn || !ln) return false;
+        if (fn.toLowerCase()==='undefined' || ln.toLowerCase()==='undefined') return false;
+        return true;
+      }
+      function cleanInvalidPatients() {
+        const patients = getStore(S.patientsKey);
+        const filtered = patients.filter(isValidPatient);
+        if (filtered.length !== patients.length) setStore(S.patientsKey, filtered);
+      }
+      function openPatient(id) {
+        const patients = getStore(S.patientsKey); const p = patients.find(x=>x.id===id); if (!p) return;
+        p.lastViewed = Date.now(); setStore(S.patientsKey, patients); alert(`${p.firstName} ${p.lastName} opened`);
+      }
+
+      function refreshDietPatientSelect() {
+        const sel = document.getElementById('dietPatient'); sel.innerHTML = '';
+        getStore(S.patientsKey).filter(isValidPatient).forEach(p => { const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.firstName+' '+p.lastName; sel.appendChild(opt); });
+      }
+
+      function numeric(n) { return isFinite(n) ? Number(n) : 0; }
+      function findFoodByName(name) {
+        const foods = getStore(S.foodsKey);
+        const f = foods.find(x => x.name.toLowerCase() === name.toLowerCase());
+        return f || null;
+      }
+      function searchFoods(q) {
+        const foods = getStore(S.foodsKey);
+        q = q.toLowerCase();
+        return foods.filter(f => f.name.toLowerCase().includes(q)).slice(0, 20);
+      }
+
+      const mealItems = [];
+      function refreshDietView() {
+        refreshDietPatientSelect();
+        document.getElementById('dietFoodInput').value = '';
+        document.getElementById('dietQuantity').value = 100;
+        document.getElementById('dietFoodSuggestions').classList.add('hidden');
+        renderMealItems(); renderDayPlan(); renderAnalysis(); document.getElementById('dietFeedback').textContent = '';
+      }
+
+      document.getElementById('dietFoodInput').oninput = () => {
+        const q = document.getElementById('dietFoodInput').value.trim();
+        const box = document.getElementById('dietFoodSuggestions'); box.innerHTML='';
+        if (!q) { box.classList.add('hidden'); return; }
+        const results = searchFoods(q);
+        results.forEach(r => { const d = document.createElement('div'); d.textContent = r.name; d.onclick = () => { document.getElementById('dietFoodInput').value = r.name; box.classList.add('hidden'); }; box.appendChild(d); });
+        box.classList.toggle('hidden', results.length === 0);
+      };
+      document.getElementById('addFoodBtn').onclick = () => {
+        const name = document.getElementById('dietFoodInput').value.trim();
+        const qty = numeric(document.getElementById('dietQuantity').value || 0);
+        if (!name || qty <= 0) { alert('Enter item and quantity'); return; }
+        const f = findFoodByName(name);
+        if (!f) { alert('Food not found. Use Import Foods to add more.'); return; }
+        mealItems.push({ id: uid('itm'), name: f.name, qty, f }); renderMealItems(); renderAnalysis(); document.getElementById('dietFoodInput').value='';
+      };
+      function renderMealItems() {
+        const tbody = document.querySelector('#mealItemsTable tbody'); tbody.innerHTML='';
+        mealItems.forEach(it => {
+          const scale = it.qty/100;
+          const tr = document.createElement('tr');
+          const doshaTag = `${fmtDosha(it.f.dosha)}`;
+          tr.innerHTML = `<td>${it.name}</td><td>${it.qty} g</td><td>${fmt(it.f.calories*scale)}</td><td>${fmt(it.f.protein*scale)}</td><td>${fmt(it.f.carbs*scale)}</td><td>${fmt(it.f.fats*scale)}</td><td>${it.f.rasa}</td><td>${it.f.virya}</td><td>${it.f.vipaka}</td><td>${doshaTag}</td><td class='right'><button class='btn danger' data-id='${it.id}'>Remove</button></td>`;
+          tr.querySelector('button').onclick = () => { const idx = mealItems.findIndex(x=>x.id===it.id); if (idx>=0) { mealItems.splice(idx,1); renderMealItems(); renderAnalysis(); } };
+          tbody.appendChild(tr);
+        });
+      }
+      function fmt(n) { return Math.round(n*10)/10; }
+      function fmtDosha(d) { const p = d.pitta, v = d.vata, k = d.kapha; return `<span class='tag'>P ${p}</span><span class='tag'>V ${v}</span><span class='tag'>K ${k}</span>`; }
+      function analyzeMeal() {
+        let cal=0, prot=0, carbs=0, fats=0, vit=0, min=0, p=0, v=0, k=0;
+        mealItems.forEach(it => {
+          const s = it.qty/100; const f = it.f;
+          cal += f.calories*s; prot += f.protein*s; carbs += f.carbs*s; fats += f.fats*s; vit += f.vitamins*s/100; min += f.minerals*s/100;
+          p += f.dosha.pitta*s; v += f.dosha.vata*s; k += f.dosha.kapha*s;
+        });
+        return { calories:fmt(cal), protein:fmt(prot), carbs:fmt(carbs), fats:fmt(fats), vitamins:fmt(vit*100), minerals:fmt(min*100), pitta:fmt(p), vata:fmt(v), kapha:fmt(k) };
+      }
+      function renderAnalysis() {
+        const a = analyzeMeal();
+        document.getElementById('aCalories').textContent = a.calories;
+        document.getElementById('aProtein').textContent = a.protein;
+        document.getElementById('aCarbs').textContent = a.carbs;
+        document.getElementById('aFats').textContent = a.fats;
+        document.getElementById('aVitamins').textContent = a.vitamins;
+        document.getElementById('aMinerals').textContent = a.minerals;
+        document.getElementById('aPitta').textContent = a.pitta;
+        document.getElementById('aVata').textContent = a.vata;
+        document.getElementById('aKapha').textContent = a.kapha;
+        const feedback = [];
+        if (a.pitta > 1.5) feedback.push('High pitta-aggravating profile');
+        if (a.vata > 1.5) feedback.push('High vata-aggravating profile');
+        if (a.kapha > 1.5) feedback.push('High kapha-aggravating profile');
+        if (a.protein < 15) feedback.push('Protein may be low');
+        if (a.calories > 900) feedback.push('Calories are high');
+        document.getElementById('dietFeedback').textContent = feedback.join(' • ');
+        document.getElementById('dietAnalysisNotice').textContent = mealItems.length ? 'Meal analysis' : 'Add items to see analysis.';
+      }
+
+      document.getElementById('saveMealBtn').onclick = () => {
+        const patientId = document.getElementById('dietPatient').value; const date = document.getElementById('dietDate').value; const meal = document.getElementById('dietMeal').value;
+        if (!patientId || !date) { alert('Select patient and date'); return; }
+        const charts = getStore(S.chartsKey);
+        let chart = charts.find(c => c.patientId===patientId && c.date===date);
+        if (!chart) { chart = { id: uid('chart'), patientId, date, meals: {}, notes:'' }; charts.push(chart); }
+        chart.meals[meal] = mealItems.map(it=>({ name: it.name, qty: it.qty }));
+        setStore(S.chartsKey, charts);
+        renderDayPlan(); alert('Meal saved to chart');
+      };
+      function renderDayPlan() {
+        const patientId = document.getElementById('dietPatient').value; const date = document.getElementById('dietDate').value;
+        const list = document.getElementById('dayPlanList'); list.innerHTML='';
+        if (!patientId || !date) return;
+        const charts = getStore(S.chartsKey);
+        const chart = charts.find(c => c.patientId===patientId && c.date===date);
+        if (!chart) return;
+        Object.keys(chart.meals).forEach(meal => {
+          const items = chart.meals[meal]; const li = document.createElement('li');
+          li.innerHTML = `<div><strong>${meal}</strong><div class='muted'>${items.map(i=>i.name+'('+i.qty+'g)').join(', ')}</div></div><div class='toolbar'><button class='btn' data-meal='${meal}'>Edit</button></div>`;
+          li.querySelector('button').onclick = () => { document.getElementById('dietMeal').value = meal; mealItems.splice(0, mealItems.length); items.forEach(i => { const f = findFoodByName(i.name); if (f) mealItems.push({ id: uid('itm'), name: f.name, qty: i.qty, f }); }); renderMealItems(); renderAnalysis(); };
+          list.appendChild(li);
+        });
+        document.getElementById('dietNotes').value = chart.notes || '';
+      }
+      document.getElementById('saveDayPlanBtn').onclick = () => {
+        const patientId = document.getElementById('dietPatient').value; const date = document.getElementById('dietDate').value;
+        const charts = getStore(S.chartsKey); const chart = charts.find(c => c.patientId===patientId && c.date===date);
+        if (!chart) { alert('No meals yet'); return; }
+        chart.notes = document.getElementById('dietNotes').value;
+        setStore(S.chartsKey, charts); alert('Day plan finalized');
+      };
+
+      function refreshRecipes() {
+        const list = document.getElementById('recipesList'); list.innerHTML='';
+        const patients = getStore(S.patientsKey).filter(isValidPatient);
+        const sel = document.getElementById('recipeModalPatient'); if (sel) { sel.innerHTML=''; patients.forEach(p => { const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.firstName+' '+p.lastName; sel.appendChild(opt); }); }
+        getStore(S.recipesKey).forEach(r => {
+          const li = document.createElement('li');
+          li.innerHTML = `<div><strong>${r.name}</strong><div class='muted'>${r.items.map(i=>i.name+'('+i.qty+'g)').join(', ')}</div></div><div class='toolbar'><button class='btn' data-id='${r.id}'>Details</button></div>`;
+          li.querySelector('button').onclick = () => openRecipeModal(r);
+          list.appendChild(li);
+        });
+        refreshRecipeItemsTable([]);
+      }
+      function analyzeRecipe(recipe) {
+        let cal=0, prot=0, carbs=0, fats=0;
+        recipe.items.forEach(it => {
+          const f = findFoodByName(it.name); if (!f) return; const s = it.qty/100;
+          cal += f.calories*s; prot += f.protein*s; carbs += f.carbs*s; fats += f.fats*s;
+        });
+        return { calories: cal, protein: prot, carbs, fats };
+      }
+      function aggregateDosha(items) {
+        let p=0,v=0,k=0; let cal=0, prot=0, carbs=0, fats=0;
+        items.forEach(it => { const f = findFoodByName(it.name); if (!f) return; const s = (it.qty||100)/100; p += (f.dosha.pitta||0)*s; v += (f.dosha.vata||0)*s; k += (f.dosha.kapha||0)*s; cal += f.calories*s; prot += f.protein*s; carbs += f.carbs*s; fats += f.fats*s; });
+        return { pitta:fmt(p), vata:fmt(v), kapha:fmt(k), calories:fmt(cal), protein:fmt(prot), carbs:fmt(carbs), fats:fmt(fats) };
+      }
+      function explainRecommendation(patient, time, agg) {
+        const reasons = [];
+        const vik = (patient?.vikriti||'Balanced').toLowerCase();
+        const agni = (patient?.agni||'Samagni').toLowerCase();
+        if (time==='Breakfast') reasons.push('Breakfast kept lighter and grounding');
+        if (time==='Lunch') reasons.push('Lunch balanced with main proteins and carbs');
+        if (time==='Dinner') reasons.push('Dinner lighter to support overnight digestion');
+        if (time==='Snack') reasons.push('Snack supports satiety without excess calories');
+        if (vik!=='balanced') reasons.push(`Targets ${vik} balance with low ${vik} aggravation`);
+        if (agni==='mandagni') reasons.push('Gentle for weak Agni (Mandagni)');
+        if (agni==='vishamagni') reasons.push('Warming elements for Vishamagni');
+        if (agni==='tikshnagni') reasons.push('Moderated heat for Tikshnagni');
+        const corrections = [];
+        if (agg.protein < (time==='Lunch'?20:12)) corrections.push('Add Moong Dal or Paneer to raise protein');
+        if (time!=='Lunch' && agg.calories > 700) corrections.push('Reduce portions for non-lunch meal');
+        if (agg.kapha > 1.6 && time==='Dinner') corrections.push('Swap heavy items for greens to avoid Kapha aggravation');
+        if (agg.pitta > 1.6 && time==='Lunch') corrections.push('Dial down pungent spices to calm Pitta');
+        return { reasons, corrections };
+      }
+      function openRecipeModal(recipe) {
+        const modal = document.getElementById('recipeModal'); if (!modal) return;
+        const title = document.getElementById('recipeModalTitle');
+        const body = document.getElementById('recipeModalBody');
+        const timeSel = document.getElementById('recipeModalTime');
+        const patientSel = document.getElementById('recipeModalPatient');
+        function render() {
+          const time = timeSel.value;
+          const patientId = patientSel.value; const patient = getStore(S.patientsKey).find(x=>x.id===patientId);
+          const agg = aggregateDosha(recipe.items);
+          const { reasons, corrections } = explainRecommendation(patient, time, agg);
+          title.textContent = recipe.name;
+          body.innerHTML = `
+            <div class='grid cols-3'>
+              <div class='stat'><div class='muted'>Calories</div><div class='value'>${agg.calories}</div></div>
+              <div class='stat'><div class='muted'>Protein</div><div class='value'>${agg.protein} g</div></div>
+              <div class='stat'><div class='muted'>Carbs</div><div class='value'>${agg.carbs} g</div></div>
+            </div>
+            <div class='grid cols-3' style='margin-top:8px'>
+              <div class='stat'><div class='muted'>Fats</div><div class='value'>${agg.fats} g</div></div>
+              <div class='stat'><div class='muted'>Pitta</div><div class='value'>${agg.pitta}</div></div>
+              <div class='stat'><div class='muted'>Kapha</div><div class='value'>${agg.kapha}</div></div>
+            </div>
+            <div class='notice' style='margin-top:8px'><strong>Why recommended for ${time}:</strong> ${reasons.join(' • ')}</div>
+            ${corrections.length?`<div class='notice' style='margin-top:8px'><strong>Corrections:</strong> ${corrections.join(' • ')}</div>`:''}
+            <div style='margin-top:8px'><strong>Ingredients:</strong> ${recipe.items.map(i=>i.name+'('+i.qty+'g)').join(', ')}</div>
+          `;
+        }
+        timeSel.onchange = render; patientSel.onchange = render;
+        document.getElementById('recipeModalClose').onclick = () => { modal.classList.add('hidden'); };
+        render();
+        modal.classList.remove('hidden');
+      }
+      const recipeItems = [];
+      document.getElementById('recipeFoodInput').oninput = () => {
+        const q = document.getElementById('recipeFoodInput').value.trim(); const box = document.getElementById('recipeFoodSuggestions'); box.innerHTML='';
+        if (!q) { box.classList.add('hidden'); return; }
+        const results = searchFoods(q);
+        results.forEach(r => { const d = document.createElement('div'); d.textContent = r.name; d.onclick = () => { document.getElementById('recipeFoodInput').value = r.name; box.classList.add('hidden'); }; box.appendChild(d); });
+        box.classList.toggle('hidden', results.length === 0);
+      };
+      function refreshRecipeItemsTable(items) {
+        const tbody = document.querySelector('#recipeItemsTable tbody'); tbody.innerHTML='';
+        items.forEach(it => {
+          const f = findFoodByName(it.name); const s = it.qty/100; const tr = document.createElement('tr');
+          tr.innerHTML = `<td>${it.name}</td><td>${it.qty} g</td><td>${fmt((f?.calories||0)*s)}</td><td>${fmt((f?.protein||0)*s)}</td><td>${fmt((f?.carbs||0)*s)}</td><td>${fmt((f?.fats||0)*s)}</td><td class='right'><button class='btn danger' data-id='${it.id}'>Remove</button></td>`;
+          tr.querySelector('button').onclick = () => { const idx = recipeItems.findIndex(x=>x.id===it.id); if (idx>=0) { recipeItems.splice(idx,1); refreshRecipeItemsTable(recipeItems); } };
+          tbody.appendChild(tr);
+        });
+      }
+      document.getElementById('addIngredientBtn').onclick = () => {
+        const name = document.getElementById('recipeFoodInput').value.trim(); const qty = numeric(document.getElementById('recipeQuantity').value||0);
+        if (!name || qty <= 0) { alert('Enter ingredient and quantity'); return; }
+        const f = findFoodByName(name); if (!f) { alert('Food not found'); return; }
+        recipeItems.push({ id: uid('ing'), name, qty }); refreshRecipeItemsTable(recipeItems); document.getElementById('recipeFoodInput').value='';
+      };
+      document.getElementById('saveRecipeBtn').onclick = () => {
+        const name = document.getElementById('recipeName').value.trim(); if (!name || recipeItems.length===0) { alert('Enter name and ingredients'); return; }
+        const recipes = getStore(S.recipesKey); recipes.push({ id: uid('rec'), name, items: recipeItems.slice() }); setStore(S.recipesKey, recipes);
+        recipeItems.splice(0, recipeItems.length); document.getElementById('recipeName').value=''; refreshRecipes(); alert('Recipe saved');
+      };
+      document.getElementById('importRecipesBtn').onclick = () => { document.getElementById('recipesImport').click(); };
+      document.getElementById('recipesImport').onchange = async (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const text = await file.text();
+        let json; try { json = JSON.parse(text); } catch(err) { alert('Invalid JSON'); return; }
+        if (!Array.isArray(json)) { alert('JSON must be an array of recipes'); return; }
+        const mapped = [];
+        json.forEach(r => {
+          const name = r.name || r.title || r.recipe_name || 'Recipe';
+          const ingredients = r.ingredients || r.items || r.components || [];
+          const items = [];
+          ingredients.forEach(i => {
+            const iname = i.name || i.ingredient || i.ingredient_name || i.item || '';
+            const qty = Number(i.qty || i.quantity || i.quantity_g || i.weight_g || i.amount_g || 100);
+            if (iname) items.push({ name: iname, qty });
+          });
+          if (items.length) mapped.push({ id: uid('rec'), name, items });
+        });
+        const recipes = getStore(S.recipesKey); setStore(S.recipesKey, recipes.concat(mapped));
+        alert('Imported '+mapped.length+' recipes'); refreshRecipes();
+      };
+      document.getElementById('addRecipeToMealBtn').onclick = () => {
+        const recipes = getStore(S.recipesKey); if (recipes.length===0) { alert('No recipes found'); return; }
+        const r = recipes[0]; r.items.forEach(i => { const f = findFoodByName(i.name); if (f) mealItems.push({ id: uid('itm'), name: f.name, qty: i.qty, f }); }); renderMealItems(); renderAnalysis(); alert(`Added recipe: ${r.name}`);
+      };
+
+      function refreshReportPatientSelect() {
+        const sel = document.getElementById('reportPatient'); sel.innerHTML='';
+        getStore(S.patientsKey).filter(isValidPatient).forEach(p => { const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.firstName+' '+p.lastName; sel.appendChild(opt); });
+      }
+      function refreshReports() { refreshReportPatientSelect(); }
+      document.getElementById('loadReportBtn').onclick = () => {
+        const patientId = document.getElementById('reportPatient').value; const date = document.getElementById('reportDate').value;
+        const div = document.getElementById('reportContent'); div.innerHTML='';
+        if (!patientId || !date) { alert('Select patient and date'); return; }
+        const charts = getStore(S.chartsKey); const chart = charts.find(c => c.patientId===patientId && c.date===date);
+        const patients = getStore(S.patientsKey); const p = patients.find(x=>x.id===patientId);
+        if (!chart || !p) { div.innerHTML = '<div class="notice">No chart found for this date.</div>'; return; }
+        const header = `<h3>${p.firstName} ${p.lastName}</h3><div class='muted'>${date}</div>`;
+        const rows = Object.entries(chart.meals).map(([meal,items])=>{
+          const a = analyzeItems(items);
+          const foods = items.map(i=>i.name+'('+i.qty+'g)').join(', ');
+          return `<tr><td>${meal}</td><td>${foods}</td><td>${fmt(a.calories)} kcal</td><td>${fmt(a.protein)} g</td><td>${fmt(a.carbs)} g</td><td>${fmt(a.fats)} g</td></tr>`;
+        }).join('');
+        const notes = chart.notes ? `<div class='notice'><strong>Notes:</strong> ${chart.notes}</div>` : '';
+        div.innerHTML = `${header}<table class='table'><thead><tr><th>Meal</th><th>Items</th><th>Calories</th><th>Protein</th><th>Carbs</th><th>Fats</th></tr></thead><tbody>${rows}</tbody></table>${notes}`;
+      };
+      function analyzeItems(items) {
+        let cal=0, prot=0, carbs=0, fats=0;
+        items.forEach(it => { const f = findFoodByName(it.name); if (!f) return; const s = it.qty/100; cal += f.calories*s; prot += f.protein*s; carbs += f.carbs*s; fats += f.fats*s; });
+        return { calories:cal, protein:prot, carbs, fats };
+      }
+      document.getElementById('printReportBtn').onclick = () => { window.print(); };
+
+      // Planner
+      function refreshPlanner() {
+        const sel = document.getElementById('plannerPatient'); sel.innerHTML='';
+        getStore(S.patientsKey).filter(isValidPatient).forEach(p => { const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.firstName+' '+p.lastName; sel.appendChild(opt); });
+        renderWeek([]);
+      }
+      function renderWeek(days) {
+        const grid = document.getElementById('weekGrid');
+        if (!days.length) { grid.innerHTML = '<div class="notice">Generate a plan to see the week grid.</div>'; return; }
+        const head = `<div class='week-grid'><div class='head'></div><div class='head'>Breakfast</div><div class='head'>Lunch</div><div class='head'>Dinner</div><div class='head'>Snack</div></div>`;
+        const rows = days.map((d, di) => {
+          const meals = ['Breakfast','Lunch','Dinner','Snack'].map(m => {
+            const text = (d.meals[m]||[]).map(i=>i.name+'('+i.qty+'g)').join(', ')||'-';
+            return `<div class='week-day fade-in' data-day='${di}' data-meal='${m}'>${text}</div>`;
+          }).join('');
+          return `<div class='week-grid'><div class='pill'>${d.date}</div>${meals}</div>`;
+        }).join('');
+        grid.innerHTML = head + rows;
+        Array.from(grid.querySelectorAll('.week-day')).forEach(el => {
+          el.onclick = () => {
+            const di = Number(el.getAttribute('data-day')); const meal = el.getAttribute('data-meal');
+            openPlannerDetail(di, meal);
+          };
+        });
+      }
+      function openPlannerDetail(dayIndex, mealType) {
+        const modal = document.getElementById('plannerDetailModal'); const title = document.getElementById('plannerDetailTitle'); const body = document.getElementById('plannerDetailBody');
+        const day = generatedWeek[dayIndex]; const items = day.meals[mealType]||[];
+        const patientId = document.getElementById('plannerPatient').value; const patient = getStore(S.patientsKey).find(x=>x.id===patientId);
+        const agg = aggregateDosha(items);
+        const exp = day.explanations?.[mealType] || explainRecommendation(patient, mealType, agg);
+        title.textContent = `${mealType} – ${day.date}`;
+        body.innerHTML = `
+          <div><strong>Items:</strong> ${items.map(i=>i.name+'('+i.qty+'g)').join(', ')||'-'}</div>
+          <div class='grid cols-3' style='margin-top:8px'>
+            <div class='stat'><div class='muted'>Calories</div><div class='value'>${agg.calories}</div></div>
+            <div class='stat'><div class='muted'>Protein</div><div class='value'>${agg.protein} g</div></div>
+            <div class='stat'><div class='muted'>Carbs</div><div class='value'>${agg.carbs} g</div></div>
+          </div>
+          <div class='grid cols-3' style='margin-top:8px'>
+            <div class='stat'><div class='muted'>Fats</div><div class='value'>${agg.fats} g</div></div>
+            <div class='stat'><div class='muted'>Pitta</div><div class='value'>${agg.pitta}</div></div>
+            <div class='stat'><div class='muted'>Vata</div><div class='value'>${agg.vata}</div></div>
+          </div>
+          <div class='notice' style='margin-top:8px'><strong>Why recommended:</strong> ${exp.reasons.join(' • ')}</div>
+          ${exp.corrections?.length?`<div class='notice' style='margin-top:8px'><strong>Corrections:</strong> ${exp.corrections.join(' • ')}</div>`:''}
+        `;
+        document.getElementById('plannerDetailClose').onclick = () => { modal.classList.add('hidden'); };
+        modal.classList.remove('hidden');
+      }
+      function preferFoodsForDosha(dosha) {
+        const foods = getStore(S.foodsKey);
+        const key = dosha.toLowerCase();
+        return foods.slice().sort((a,b)=> (a.dosha[key]||0) - (b.dosha[key]||0));
+      }
+      function mealCandidates(mealType) {
+        const sets = {
+          Breakfast: [
+            ['Oats','Yogurt','Banana'],
+            ['Porridge','Apple','Almonds'],
+            ['Besan Chilla','Raita','Green Tea'],
+            ['Chapati','Paneer','Cucumber']
+          ],
+          Lunch: [
+            ['Dal Khichdi','Spinach','Raita'],
+            ['Basmati Rice','Moong Dal','Cucumber'],
+            ['Quinoa','Lentils','Pumpkin'],
+            ['Brown Rice','Paneer','Carrot']
+          ],
+          Dinner: [
+            ['Moong Dal','Chapati','Cucumber'],
+            ['Quinoa','Spinach','Raita'],
+            ['Oats','Yogurt','Pumpkin'],
+            ['Basmati Rice','Lentils','Coriander']
+          ],
+          Snack: [
+            ['Apple','Almonds'],
+            ['Pear','Yogurt'],
+            ['Papaya','Mung Sprouts'],
+            ['Green Tea','Dates']
+          ]
+        };
+        return sets[mealType] || [];
+      }
+      function analyzeSet(names, agni, mealType) {
+        const items = names.map(n=>({ name:n, qty: mealType==='Snack'? (n==='Almonds'?20:100) : 100 }));
+        if (agni==='mandagni') items.forEach(i=> i.qty = Math.round(i.qty*0.8));
+        if (agni==='tikshnagni' && mealType==='Lunch') items.forEach(i=> i.qty = Math.round(i.qty*1.1));
+        const agg = aggregateDosha(items);
+        return { items, agg };
+      }
+      function scoreSet(agg, patient, mealType) {
+        const vik = (patient.vikriti||'Balanced').toLowerCase();
+        let score = 0;
+        score += Math.min(agg.protein, mealType==='Lunch'?30:18);
+        score += Math.max(0, 600-agg.calories)/100;
+        if (vik!=='balanced') {
+          const d = agg[vik];
+          score -= d*2;
+        } else {
+          score -= (agg.pitta + agg.vata + agg.kapha)/3;
+        }
+        return score;
+      }
+      const MAX_REPEAT = { Breakfast: 2, Lunch: 3, Dinner: 2, Snack: 3 };
+      function fingerprint(items) {
+        return items.map(i=>i.name).slice().sort().join('|');
+      }
+      function primaryItem(items) {
+        // Choose highest protein as primary
+        let best = items[0]?.name || '';
+        let maxP = -1; items.forEach(i => { const f = findFoodByName(i.name); const p = (f?.protein||0) * (i.qty||100)/100; if (p>maxP) { maxP=p; best=i.name; } });
+        return best;
+      }
+      function chooseItems(patient, mealType, variety) {
+        const agni = (patient.agni||'Samagni').toLowerCase();
+        const cands = mealCandidates(mealType).map(names => analyzeSet(names, agni, mealType));
+        const recipes = getStore(S.recipesKey).slice(0,12);
+        recipes.forEach(r => { const agg = aggregateDosha(r.items); const items = r.items.map(i=>({ name:i.name, qty:i.qty })); cands.push({ items, agg, recipe:r }); });
+        // Score candidates with variety penalties
+        const usedNames = variety.usedNames; const usedByMeal = variety.usedByMeal; const lastByMeal = variety.lastByMeal; const itemCounts = variety.itemCounts;
+        const lastPrimary = lastByMeal[mealType] || '';
+        const counts = itemCounts[mealType] || (itemCounts[mealType] = {});
+        const maxRepeat = MAX_REPEAT[mealType] || 2;
+        const scored = cands.map(c => {
+          let base = scoreSet(c.agg, patient, mealType);
+          let penalty = 0;
+          // Penalize used names and exceeding repeat caps
+          c.items.forEach(i => {
+            if (usedNames.has(i.name)) penalty += 1.5;
+            const cnt = counts[i.name]||0; if (cnt >= maxRepeat) penalty += 3;
+          });
+          const fp = fingerprint(c.items); const fpCnt = (usedByMeal[mealType]?.[fp]||0); if (fpCnt>0) penalty += 2*fpCnt;
+          const prim = primaryItem(c.items); if (prim && prim===lastPrimary) penalty += 3;
+          return { cand: c, score: base - penalty, fp, prim };
+        }).sort((a,b)=> b.score - a.score);
+        // Pick the highest that respects hard caps if possible
+        let choice = scored.find(s => s.cand.items.every(i => (counts[i.name]||0) < maxRepeat)) || scored[0];
+        const pick = choice.cand; const explanation = explainRecommendation(patient, mealType, pick.agg);
+        // Update variety trackers
+        pick.items.forEach(i=>{ usedNames.add(i.name); counts[i.name] = (counts[i.name]||0) + 1; });
+        usedByMeal[mealType] = usedByMeal[mealType] || {}; usedByMeal[mealType][choice.fp] = (usedByMeal[mealType][choice.fp]||0)+1;
+        lastByMeal[mealType] = choice.prim;
+        return { items: pick.items, explanation };
+      }
+      function generateWeek(patientId, startDate) {
+        const patients = getStore(S.patientsKey); const p = patients.find(x=>x.id===patientId); if (!p) return [];
+        const base = new Date(startDate);
+        const days = [];
+        const variety = { usedNames: new Set(), usedByMeal: {}, lastByMeal: {}, itemCounts: {} };
+        for (let i=0;i<7;i++) {
+          const d = new Date(base.getTime() + i*86400000).toISOString().slice(0,10);
+          const B = chooseItems(p,'Breakfast', variety);
+          const L = chooseItems(p,'Lunch', variety);
+          const D = chooseItems(p,'Dinner', variety);
+          const S = chooseItems(p,'Snack', variety);
+          const meals = { Breakfast: B.items, Lunch: L.items, Dinner: D.items, Snack: S.items };
+          const explanations = { Breakfast: B.explanation, Lunch: L.explanation, Dinner: D.explanation, Snack: S.explanation };
+          days.push({ date: d, meals, explanations });
+        }
+        return days;
+      }
+      let generatedWeek = [];
+      document.getElementById('generateWeekBtn').onclick = () => {
+        const patientId = document.getElementById('plannerPatient').value; const start = document.getElementById('plannerStartDate').value;
+        if (!patientId || !start) { alert('Select patient and start date'); return; }
+        generatedWeek = generateWeek(patientId, start);
+        renderWeek(generatedWeek);
+      };
+      document.getElementById('saveWeekBtn').onclick = () => {
+        if (!generatedWeek.length) { alert('Generate a plan first'); return; }
+        const patientId = document.getElementById('plannerPatient').value;
+        const charts = getStore(S.chartsKey);
+        generatedWeek.forEach(day => {
+          let chart = charts.find(c => c.patientId===patientId && c.date===day.date);
+          if (!chart) { chart = { id: uid('chart'), patientId, date: day.date, meals: {}, notes:'' }; charts.push(chart); }
+          chart.meals = day.meals;
+        });
+        setStore(S.chartsKey, charts);
+        alert('Weekly plan saved');
+      };
+
+      function refreshProgressPatientSelect() {
+        const sel = document.getElementById('progressPatient'); sel.innerHTML='';
+        getStore(S.patientsKey).filter(isValidPatient).forEach(p => { const opt = document.createElement('option'); opt.value = p.id; opt.textContent = p.firstName+' '+p.lastName; sel.appendChild(opt); });
+        refreshProgressHistory();
+      }
+      function refreshProgress() { refreshProgressPatientSelect(); }
+      document.getElementById('saveProgressBtn').onclick = () => {
+        const patientId = document.getElementById('progressPatient').value; const date = document.getElementById('progressDate').value; const w = numeric(document.getElementById('progressWeight').value||0); const notes = document.getElementById('progressNotes').value;
+        if (!patientId || !date) { alert('Select patient and date'); return; }
+        const ap = getStore(S.apptsKey); ap.push({ id: uid('prog'), patientId, patientName: getPatientName(patientId), date, time:'', progress:{ weight:w, notes } }); setStore(S.apptsKey, ap);
+        refreshProgressHistory(); alert('Progress saved');
+      };
+      function getPatientName(id) { const p = getStore(S.patientsKey).find(x=>x.id===id); return p ? p.firstName+' '+p.lastName : 'Unknown'; }
+      function refreshProgressHistory() {
+        const patientId = document.getElementById('progressPatient').value; const list = document.getElementById('progressList'); list.innerHTML='';
+        const hist = getStore(S.apptsKey).filter(a => a.patientId===patientId && a.progress).sort((a,b)=>new Date(b.date)-new Date(a.date));
+        hist.forEach(h => { const li = document.createElement('li'); li.innerHTML = `<div>${h.date}</div><div class='pill'>${h.progress.weight||'-'} kg</div>`; list.appendChild(li); });
+      }
+
+      document.getElementById('importFoodsBtn').onclick = () => { document.getElementById('foodsImport').click(); };
+      document.getElementById('foodsImport').onchange = async (e) => {
+        const file = e.target.files[0]; if (!file) return;
+        const text = await file.text();
+        let json;
+        try { json = JSON.parse(text); } catch(err) { alert('Invalid JSON'); return; }
+        if (!Array.isArray(json)) { alert('JSON must be an array of food items'); return; }
+        const foods = getStore(S.foodsKey); const merged = foods.concat(json.filter(x=>x && x.name));
+        setStore(S.foodsKey, merged); alert('Imported '+json.length+' items');
+      };
+
+      if (getSession()) showApp();
+    </script>
+  </body>
+</html>

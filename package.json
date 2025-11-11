@@ -1,0 +1,15 @@
+{
+  "name": "ayursync",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AyurSync – Ayurvedic Dietitian Platform (minimal frontend + backend)",
+  "scripts": {
+    "backend": "node backend/server.js",
+    "frontend": "python -m http.server 5173",
+    "frontend:npx": "npx serve -l 5173 ."
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  }
+}
