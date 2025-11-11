@@ -1,4 +1,4 @@
-# AyurSync – Ayurvedic Dietitian Platform (Minimal Deployment)
+# AyurSync – Ayurvedic Dietitian Platform 
 
 AyurSync is a single-file frontend with a minimal Node backend to manage Ayurvedic patient data and generate diet charts with modern nutritional analysis and Ayurvedic properties.
 
