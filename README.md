@@ -2,6 +2,8 @@
 
 AyurSync is a single-file frontend with a minimal Node backend to manage Ayurvedic patient data and generate diet charts with modern nutritional analysis and Ayurvedic properties.
 
+🌐 **Live Demo:** [Visit on Vercel]https://ayur-sync.vercel.app/
+
 This repo keeps files minimal:
 - `index.html` – Full SPA with embedded CSS/JS
 - `backend/server.js` – Minimal Express REST API (in-memory)
